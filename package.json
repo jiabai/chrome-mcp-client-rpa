@@ -1,0 +1,47 @@
+{
+  "name": "chrome-mcp-client-rpa",
+  "version": "1.0.0",
+  "description": "A Chrome MCP client for RPA automation that enables browser automation, dialogue extraction, and web scraping capabilities",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/1-exportDeepSeekDom.mjs",
+    "extract-dialogue": "node src/2-htmlDialogueExtractor.mjs",
+    "count-links": "node src/3-totalLinks.mjs",
+    "extract-history": "node src/4-historyRecordExtractor.mjs",
+    "ping-llm": "node src/llmPing.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chrome",
+    "mcp",
+    "rpa",
+    "automation",
+    "web-scraping",
+    "dialogue-extraction",
+    "browser-automation",
+    "llm",
+    "deepseek"
+  ],
+  "author": "Chrome MCP RPA Team",
+  "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/chrome-mcp-client-rpa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/username/chrome-mcp-client-rpa/issues"
+  },
+  "homepage": "https://github.com/username/chrome-mcp-client-rpa#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.21.1",
+    "chrome-devtools-mcp": "^0.10.1",
+    "dotenv": "^17.2.3",
+    "openai": "^6.8.1",
+    "selenium-webdriver": "^4.38.0",
+    "ws": "^8.18.3"
+  }
+}
