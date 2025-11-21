@@ -1,204 +1,123 @@
-# Chrome MCP Client RPA
+# DeepSeek 历史问答清空脚本
 
-A powerful Chrome automation tool that leverages the Model Context Protocol (MCP) for browser automation, dialogue extraction, and web scraping capabilities. This RPA (Robotic Process Automation) client enables seamless interaction with web applications, particularly optimized for LLM platforms like DeepSeek.
+用于通过远程 ChromeDriver + Selenium WebDriver 操作 DeepSeek 网页版，批量清空左侧边栏的问答历史。
 
-## 🚀 Features
+## 功能概述
 
-- **Browser Automation**: Automated Chrome browser control using Selenium WebDriver
-- **Dialogue Extraction**: Extract conversations and chat histories from web platforms
-- **MCP Integration**: Model Context Protocol support for enhanced AI interactions
-- **Web Scraping**: Comprehensive content extraction and analysis
-- **LLM Integration**: Built-in support for SiliconFlow and OpenAI APIs
-- **Snapshot Capture**: Take automated screenshots and page captures
-- **Link Analysis**: Extract and analyze all links from web pages
+- 远程连接 ChromeDriver，控制 Chrome 浏览器
+- 自动定位并展开左侧边栏
+- 枚举所有历史问答条目并逐条删除
+- 处理删除确认弹窗
+- 执行前后截图用于对比验证
+- 完整操作日志写入到 `logs/`
 
-## 📋 Prerequisites
+## 安装与准备
 
-- Node.js (version 16.0.0 or higher)
-- Chrome browser installed
-- Windows operating system (PowerShell support)
-
-## 🔧 Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/username/chrome-mcp-client-rpa.git
-cd chrome-mcp-client-rpa
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Configure environment variables:
-```bash
-cp .env.example .env
-```
-
-Edit the `.env` file with your API keys and configuration:
-```env
-# SiliconFlow API Configuration
-SILICONFLOW_API_KEY=your_siliconflow_api_key_here
-
-# LLM Configuration
-MODEL_NAME=deepseek-ai/DeepSeek-V3.2-Exp
-LLM_BASE_URL=https://api.siliconflow.cn/v1
-LLM_MAX_RETRIES=2
-LLM_TIMEOUT=30000
-
-# Agent Configuration
-AGENT_MAX_STEPS=10
-TARGET_URL=https://chat.deepseek.com
-
-# Execution Configuration
-MAX_EXECUTION_TIME=120000
-```
-
-## 🎯 Usage
-
-### Start Chrome with Remote Debugging
-
-Use the provided PowerShell script to start Chrome with debugging enabled:
-```powershell
-.\scripts\Start-Chrome-9222.ps1
-```
-
-### Available Scripts
-
-- **Extract DOM Content**: `npm start`
-- **Extract Dialogue**: `npm run extract-dialogue`
-- **Count Links**: `npm run count-links`
-- **Extract History**: `npm run extract-history`
-- **Test LLM Connection**: `npm run ping-llm`
-
-### Direct Script Execution
-
-You can also run individual scripts directly:
-```bash
-node src/1-newchat-opener.js
-node src/2-chat-injector.js
-node src/3-exportDeepSeekDom.mjs
-node src/4-htmlDialogueExtractor.mjs
-node src/5-totalLinks.mjs
-node src/6-historyRecordExtractor.mjs
-```
-
-## 📁 Project Structure
+- Node.js ≥ 16，已安装项目依赖
+- 启动远程 ChromeDriver（示例）：
 
 ```
-chrome-mcp-client-rpa/
-├── src/                          # Source code
-│   ├── 1-newchat-opener.js      # New chat opener
-│   ├── 2-chat-injector.js       # Chat message injector
-│   ├── 3-exportDeepSeekDom.mjs  # DOM content extractor
-│   ├── 4-htmlDialogueExtractor.mjs # Dialogue extraction
-│   ├── 5-totalLinks.mjs         # Link counter
-│   ├── 6-historyRecordExtractor.mjs # History extractor
-│   ├── llmPing.mjs              # LLM connection test
-│   └── takeSnapshot.mjs         # Page snapshot utility
-├── scripts/                      # Utility scripts
-│   └── Start-Chrome-9222.ps1   # Chrome launcher
-├── docs/                         # Documentation
-├── output/                       # Generated outputs
-├── config.json                   # Configuration file
-├── tools.json                    # MCP tools definition
-└── tsup.config.ts               # Build configuration
+chromedriver --port=9515 --allowed-origins=* --url-base=/
 ```
 
-## 🔧 Configuration
+- 安装 TypeScript 执行环境：
 
-### MCP Configuration
-The `config.json` file contains MCP client configuration:
-```json
-{
-  "mcpServers": {
-    "chrome": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-chrome"],
-      "env": {
-        "CHROME_DEBUG_PORT": "9222"
-      }
-    }
-  }
-}
+```
+npm i -D typescript ts-node @types/node
 ```
 
-### Tools Definition
-The `tools.json` file defines available MCP tools for browser automation and content extraction.
+## 运行方式
 
-## 🛠️ Development
+- 通过 npm 脚本（推荐）：
 
-### Build Configuration
-The project uses `tsup` for building TypeScript configurations:
-```bash
-npm run build
+```
+npm run clear-history -- --remote http://127.0.0.1:9515 --url https://chat.deepseek.com/ --timeout 20000 --headless
 ```
 
-### Environment Setup
-Ensure your development environment includes:
-- Node.js 16+ with ES modules support
-- Chrome browser with remote debugging enabled
-- PowerShell execution policy allowing script execution
+- 直接使用 ts-node：
 
-## 🔒 Security
-
-- Store API keys securely in environment variables
-- Never commit sensitive configuration files
-- Use the provided `.gitignore` to exclude sensitive data
-- Regularly update dependencies for security patches
-
-## 📊 Output Files
-
-The tool generates various output files in the `output/` directory:
-- `extracted-dialogue.txt`: Extracted conversation text
-- `extracted-dialogue-history.txt`: Complete dialogue history
-- `page-captured.html`: Captured HTML content
-- `page-text-content.json`: Structured page content
-- `snapshot-take_snapshot.json`: Page snapshot data
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Chrome Connection Failed**: Ensure Chrome is running with remote debugging on port 9222
-2. **API Key Issues**: Verify your SiliconFlow API key is correctly set in `.env`
-3. **PowerShell Execution Policy**: Run `Set-ExecutionPolicy RemoteSigned` if scripts fail
-4. **Port Conflicts**: Ensure port 9222 is available for Chrome debugging
-
-### Debug Mode
-Enable debug logging by setting:
-```env
-NODE_ENV=development
-LOG_LEVEL=debug
+```
+npx ts-node --esm src/deepseek-clear-history.ts --remote http://127.0.0.1:9515 --url https://chat.deepseek.com/ --timeout 20000 --headless
 ```
 
-## 🤝 Contributing
+提示：建议预先在浏览器中登录 DeepSeek 账号，脚本将基于已登录会话执行。
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## 命令行参数
 
-## 📄 License
+- `--remote` 远程 ChromeDriver 地址，默认 `http://127.0.0.1:9515`
+- `--url` DeepSeek 入口地址，默认 `https://chat.deepseek.com/`
+- `--timeout` 显式等待超时（毫秒），默认 `20000`
+- `--headless` 启用无头模式（可选）
 
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
+## 工作流程
 
-## 🙏 Acknowledgments
+```mermaid
+flowchart TD
+  A[启动脚本] --> B{连接远程ChromeDriver}
+  B -->|成功| C[打开DeepSeek]
+  B -->|失败| Z[记录错误并退出]
+  C --> D[侧边栏定位与展开]
+  D --> E[截图（前）]
+  E --> F{枚举历史条目}
+  F -->|逐条| G[打开菜单并点击删除]
+  G --> H{确认弹窗}
+  H -->|确认| I[删除完成]
+  H -->|无弹窗| I
+  I --> F
+  F -->|无条目| J[截图（后）并验证为空]
+  J --> K[写入日志并退出]
 
-- Model Context Protocol (MCP) for browser automation
-- Selenium WebDriver for browser control
-- SiliconFlow for LLM API services
-- DeepSeek for AI platform integration
+  classDef primary fill:#0b84a5,stroke:#ffffff,color:#ffffff
+  classDef danger fill:#d9534f,stroke:#ffffff,color:#ffffff
+  class A,B,C,D,E,F,G,H,I,J,K primary
+  class Z danger
+```
 
-## 📞 Support
+## 技术要点
 
-For issues and questions:
-- Create an issue in the GitHub repository
-- Check the troubleshooting guide in `docs/troubleshooting.md`
-- Review the tool reference in `docs/tool-reference.md`
+- 显式等待：`until.elementLocated`、`until.elementIsVisible`、`until.elementIsEnabled`
+- 精准定位：优先使用 `CSS`/`XPath` 组合，提高对动态 DOM 的适配性
+- 异常处理：逐项删除过程中采用 `try-catch` 保证鲁棒性
+- 日志记录：同时输出到控制台与 `logs/deepseek-clear-history_*.log`
+- 截图对比：前后截图保存到 `output/history-before_*.png` 与 `output/history-after_*.png`
 
----
+## 选择器说明
 
-**Note**: This tool is designed for legitimate automation and data extraction purposes. Please respect website terms of service and applicable laws when using this software.
+- 侧边栏容器：`aside`、`[data-testid*="sidebar"]`、`[class*="sidebar" i]`
+- 历史条目：`aside a[href*="/chat/"]`、`//aside//a[contains(@href, "/chat/")]`
+- 条目菜单：`button[aria-label*="更多"|"More"]`、`button[aria-label*="菜单"]`
+- 菜单删除：`//div[@role="menu"]//*[contains(text(), "删除"|"Delete")]`
+- 确认弹窗：`//div[@role="dialog"]//button[contains(., "删除"|"确认"|"Delete"|"OK")]`
+
+## 测试用例（10 组）
+
+1. 已登录且存在 1 条历史，执行后应为空；日志记录成功；前后截图存在
+2. 已登录且存在多条历史，逐条删除后应为空；无异常中断
+3. 未登录，页面停留在登录页；脚本记录错误并退出，截图存在
+4. 侧边栏被折叠，脚本能自动展开并继续删除
+5. 条目没有三点菜单但存在直接删除按钮，脚本应跳过或继续下一个条目
+6. 删除弹窗出现并确认；条目被删除；无残留
+7. 删除弹窗未出现；脚本继续下一条目，最终应为空
+8. 网络延迟较大，超时参数提高到 30000，删除流程仍能完成
+9. `--headless` 模式运行，截图与日志正常生成
+10. 远程地址错误，无法连接；脚本记录错误并退出，不修改任何数据
+
+## 验证与安全
+
+- 删除范围限定在左侧边栏下的 `/chat/` 链接，避免误删设置或其他入口
+- 删除完成后二次验证：重新统计条目数量应为 0
+- 所有操作均记录日志，保留可追溯性
+
+## 常见问题
+
+- 无法定位元素：提高 `--timeout` 或确认 DeepSeek 已登录
+- 远程连接失败：检查 ChromeDriver 是否启动且允许 CORS/来源
+- 截图保存失败：确保 `output/` 目录可写
+
+## 类型检查
+
+```
+npm run typecheck
+```
+
+若需代码规范校验，请告知使用的 lint 命令，我将集成到脚本中。
