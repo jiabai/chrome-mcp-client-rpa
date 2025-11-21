@@ -1,123 +1,283 @@
-# DeepSeek 历史问答清空脚本
+# Chrome MCP Client RPA
 
-用于通过远程 ChromeDriver + Selenium WebDriver 操作 DeepSeek 网页版，批量清空左侧边栏的问答历史。
+A comprehensive Chrome automation toolkit for RPA (Robotic Process Automation) that enables browser automation, dialogue extraction, web scraping, and chat history management for DeepSeek and other LLM platforms.
 
-## 功能概述
+## 🚀 Features
 
-- 远程连接 ChromeDriver，控制 Chrome 浏览器
-- 自动定位并展开左侧边栏
-- 枚举所有历史问答条目并逐条删除
-- 处理删除确认弹窗
-- 执行前后截图用于对比验证
-- 完整操作日志写入到 `logs/`
+- **Remote Chrome Automation**: Control Chrome browser via ChromeDriver or Chrome DevTools Protocol
+- **DeepSeek Integration**: Specialized tools for DeepSeek chat platform automation
+- **Dialogue Extraction**: Extract and process chat conversations from web interfaces
+- **History Management**: Batch delete chat history entries
+- **Web Scraping**: Extract DOM content, links, and structured data
+- **Screenshot Capture**: Automated screenshot functionality for verification
+- **Multi-Modal Support**: Works with various LLM platforms and chat interfaces
 
-## 安装与准备
+## 📋 Prerequisites
 
-- Node.js ≥ 16，已安装项目依赖
-- 启动远程 ChromeDriver（示例）：
+- Node.js ≥ 16.0.0
+- Chrome browser installed
+- ChromeDriver (for Selenium-based scripts)
 
-```
-chromedriver --port=9515 --allowed-origins=* --url-base=/
-```
+## 🔧 Installation
 
-- 安装 TypeScript 执行环境：
+```bash
+# Clone the repository
+git clone https://github.com/username/chrome-mcp-client-rpa.git
+cd chrome-mcp-client-rpa
 
-```
+# Install dependencies
+npm install
+
+# Install TypeScript execution environment
 npm i -D typescript ts-node @types/node
 ```
 
-## 运行方式
+## 🎯 Available Scripts
 
-- 通过 npm 脚本（推荐）：
-
+### 1. New Chat Opener
+Opens a new chat session on DeepSeek platform.
+```bash
+npm start
+# or
+ts-node --esm src/1-newchat-opener.ts
 ```
+
+### 2. Chat Injector
+Injects custom scripts into chat interfaces.
+```bash
+ts-node --esm src/2-chat-injector.ts
+```
+
+### 3. DOM Exporter
+Exports the complete DOM structure from DeepSeek pages.
+```bash
+npm run extract-dom
+# or
+ts-node --esm src/3-exportDeepSeekDom.ts
+```
+
+### 4. Dialogue Extractor
+Extracts chat dialogues and conversations from web interfaces.
+```bash
+npm run extract-dialogue
+# or
+ts-node --esm src/4-htmlDialogueExtractor.ts
+```
+
+### 5. Link Counter
+Counts and extracts all links from web pages.
+```bash
+npm run count-links
+# or
+ts-node --esm src/5-totalLinks.ts
+```
+
+### 6. History Record Extractor
+Extracts chat history records from DeepSeek.
+```bash
+npm run extract-history
+# or
+ts-node --esm src/6-historyRecordExtractor.ts
+```
+
+### 7. Clear Chat History
+**Batch deletes chat history entries from DeepSeek sidebar.**
+```bash
 npm run clear-history -- --remote http://127.0.0.1:9515 --url https://chat.deepseek.com/ --timeout 20000 --headless
 ```
 
-- 直接使用 ts-node：
-
-```
-npx ts-node --esm src/deepseek-clear-history.ts --remote http://127.0.0.1:9515 --url https://chat.deepseek.com/ --timeout 20000 --headless
-```
-
-提示：建议预先在浏览器中登录 DeepSeek 账号，脚本将基于已登录会话执行。
-
-## 命令行参数
-
-- `--remote` 远程 ChromeDriver 地址，默认 `http://127.0.0.1:9515`
-- `--url` DeepSeek 入口地址，默认 `https://chat.deepseek.com/`
-- `--timeout` 显式等待超时（毫秒），默认 `20000`
-- `--headless` 启用无头模式（可选）
-
-## 工作流程
-
-```mermaid
-flowchart TD
-  A[启动脚本] --> B{连接远程ChromeDriver}
-  B -->|成功| C[打开DeepSeek]
-  B -->|失败| Z[记录错误并退出]
-  C --> D[侧边栏定位与展开]
-  D --> E[截图（前）]
-  E --> F{枚举历史条目}
-  F -->|逐条| G[打开菜单并点击删除]
-  G --> H{确认弹窗}
-  H -->|确认| I[删除完成]
-  H -->|无弹窗| I
-  I --> F
-  F -->|无条目| J[截图（后）并验证为空]
-  J --> K[写入日志并退出]
-
-  classDef primary fill:#0b84a5,stroke:#ffffff,color:#ffffff
-  classDef danger fill:#d9534f,stroke:#ffffff,color:#ffffff
-  class A,B,C,D,E,F,G,H,I,J,K primary
-  class Z danger
+### LLM Ping
+Tests connectivity with LLM services.
+```bash
+npm run ping-llm
+# or
+ts-node --esm src/llmPing.ts
 ```
 
-## 技术要点
+### Screenshot Capture
+Captures screenshots of web pages.
+```bash
+ts-node --esm src/takeSnapshot.ts
+```
 
-- 显式等待：`until.elementLocated`、`until.elementIsVisible`、`until.elementIsEnabled`
-- 精准定位：优先使用 `CSS`/`XPath` 组合，提高对动态 DOM 的适配性
-- 异常处理：逐项删除过程中采用 `try-catch` 保证鲁棒性
-- 日志记录：同时输出到控制台与 `logs/deepseek-clear-history_*.log`
-- 截图对比：前后截图保存到 `output/history-before_*.png` 与 `output/history-after_*.png`
+## 📝 Command Line Arguments
 
-## 选择器说明
+### Clear History Script Arguments:
+- `--remote`: Remote ChromeDriver address (default: `http://127.0.0.1:9515`)
+- `--url`: DeepSeek entry URL (default: `https://chat.deepseek.com/`)
+- `--timeout`: Explicit wait timeout in milliseconds (default: `20000`)
+- `--headless`: Enable headless mode (optional)
 
-- 侧边栏容器：`aside`、`[data-testid*="sidebar"]`、`[class*="sidebar" i]`
-- 历史条目：`aside a[href*="/chat/"]`、`//aside//a[contains(@href, "/chat/")]`
-- 条目菜单：`button[aria-label*="更多"|"More"]`、`button[aria-label*="菜单"]`
-- 菜单删除：`//div[@role="menu"]//*[contains(text(), "删除"|"Delete")]`
-- 确认弹窗：`//div[@role="dialog"]//button[contains(., "删除"|"确认"|"Delete"|"OK")]`
+### Chrome DevTools Mode (Alternative):
+- `--base`: Chrome DevTools WebSocket URL (default: `http://127.0.0.1:9222`)
 
-## 测试用例（10 组）
+## 🏗️ Architecture
 
-1. 已登录且存在 1 条历史，执行后应为空；日志记录成功；前后截图存在
-2. 已登录且存在多条历史，逐条删除后应为空；无异常中断
-3. 未登录，页面停留在登录页；脚本记录错误并退出，截图存在
-4. 侧边栏被折叠，脚本能自动展开并继续删除
-5. 条目没有三点菜单但存在直接删除按钮，脚本应跳过或继续下一个条目
-6. 删除弹窗出现并确认；条目被删除；无残留
-7. 删除弹窗未出现；脚本继续下一条目，最终应为空
-8. 网络延迟较大，超时参数提高到 30000，删除流程仍能完成
-9. `--headless` 模式运行，截图与日志正常生成
-10. 远程地址错误，无法连接；脚本记录错误并退出，不修改任何数据
+### ChromeDriver Mode (Selenium WebDriver)
+- Uses Selenium WebDriver for browser automation
+- Requires ChromeDriver service running
+- Suitable for complex user interactions
 
-## 验证与安全
+### Chrome DevTools Protocol Mode
+- Direct communication with Chrome via WebSocket
+- No external dependencies required
+- Faster and more lightweight
 
-- 删除范围限定在左侧边栏下的 `/chat/` 链接，避免误删设置或其他入口
-- 删除完成后二次验证：重新统计条目数量应为 0
-- 所有操作均记录日志，保留可追溯性
+## 🔍 Technical Implementation
 
-## 常见问题
+### Explicit Waiting Strategies
+- `until.elementLocated`: Wait for element presence
+- `until.elementIsVisible`: Wait for element visibility
+- `until.elementIsEnabled`: Wait for element interactivity
 
-- 无法定位元素：提高 `--timeout` 或确认 DeepSeek 已登录
-- 远程连接失败：检查 ChromeDriver 是否启动且允许 CORS/来源
-- 截图保存失败：确保 `output/` 目录可写
+### Element Selection Strategy
+- **Sidebar Container**: `aside`, `[data-testid*="sidebar"]`, `[class*="sidebar" i]`
+- **History Items**: `aside a[href*="/chat/"]`, `//aside//a[contains(@href, "/chat/")]`
+- **Item Menus**: `button[aria-label*="More"]`, `button[aria-label*="Menu"]`
+- **Delete Actions**: `//div[@role="menu"]//*[contains(text(), "Delete")]`
+- **Confirmation Dialogs**: `//div[@role="dialog"]//button[contains(., "Delete"|"OK")]`
 
-## 类型检查
+### Error Handling
+- Comprehensive try-catch blocks for robust operation
+- Graceful degradation when elements are not found
+- Detailed logging for debugging and verification
+
+## 📊 Test Cases
+
+1. **Single Item Deletion**: 1 chat history → 0 items after execution
+2. **Multiple Items**: Batch delete multiple history entries
+3. **Not Logged In**: Handle login page gracefully with error logging
+4. **Collapsed Sidebar**: Auto-expand and continue deletion
+5. **Different UI Variants**: Handle various button configurations
+6. **Confirmation Dialogs**: Properly handle delete confirmations
+7. **Network Delays**: High timeout (30000ms) for slow connections
+8. **Headless Mode**: Full functionality in headless environment
+9. **Connection Failures**: Graceful handling of remote connection errors
+10. **Screenshot Verification**: Before/after screenshots for validation
+
+## 🛡️ Safety & Validation
+
+- **Scoped Deletion**: Only targets `/chat/` links in sidebar
+- **Post-Deletion Verification**: Re-count items to confirm deletion
+- **Comprehensive Logging**: All operations logged for traceability
+- **Screenshot Evidence**: Before/after screenshots for verification
+- **No Data Modification**: Read-only operations except for intended deletions
+
+## 📁 Output Structure
 
 ```
+logs/
+├── deepseek-clear-history_YYYY-MM-DD_HH-mm-ss.log
+├── export-dom_YYYY-MM-DD_HH-mm-ss.log
+└── ...
+
+output/
+├── history-before_YYYY-MM-DD_HH-mm-ss.png
+├── history-after_YYYY-MM-DD_HH-mm-ss.png
+├── dom-export_YYYY-MM-DD_HH-mm-ss.json
+└── ...
+```
+
+## 🚀 Getting Started
+
+### Quick Start (ChromeDriver Mode)
+
+1. **Start ChromeDriver**:
+```bash
+chromedriver --port=9515 --allowed-origins=* --url-base=/
+```
+
+2. **Login to DeepSeek**: Open Chrome and login to https://chat.deepseek.com/
+
+3. **Run Clear History**:
+```bash
+npm run clear-history -- --remote http://127.0.0.1:9515 --url https://chat.deepseek.com/
+```
+
+### Quick Start (Chrome DevTools Mode)
+
+1. **Start Chrome with remote debugging**:
+```bash
+# Windows
+start chrome.exe --remote-debugging-port=9222
+
+# macOS
+open -a "Google Chrome" --args --remote-debugging-port=9222
+
+# Linux
+google-chrome --remote-debugging-port=9222
+```
+
+2. **Login to DeepSeek** and navigate to the chat interface
+
+3. **Run the script**:
+```bash
+ts-node --esm src/7-clear-history.ts --base http://127.0.0.1:9222 --url https://chat.deepseek.com/
+```
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Element Not Found**:
+- Increase `--timeout` parameter
+- Ensure you're logged into DeepSeek
+- Check if the page has fully loaded
+
+**Connection Failed**:
+- Verify ChromeDriver is running on specified port
+- Check firewall settings
+- Ensure ChromeDriver version matches Chrome browser version
+
+**Screenshot Save Failed**:
+- Ensure `output/` directory has write permissions
+- Check available disk space
+
+**Script Timeout**:
+- Increase timeout value for slow network connections
+- Check Chrome browser responsiveness
+
+### Debug Mode
+Enable verbose logging by checking the log files in the `logs/` directory.
+
+## 📈 Performance Optimization
+
+- Use `--headless` mode for faster execution
+- Adjust `--timeout` based on network conditions
+- Close unnecessary browser tabs to free up resources
+- Use Chrome DevTools mode for better performance
+
+## 🔒 Security Considerations
+
+- Scripts only interact with specified domains
+- No sensitive data is stored or transmitted
+- All operations are logged for audit trails
+- Browser automation is limited to user-visible actions
+
+## 📚 Additional Resources
+
+- [Selenium WebDriver Documentation](https://www.selenium.dev/documentation/)
+- [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/)
+- [DeepSeek Platform](https://chat.deepseek.com/)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+ISC License - See LICENSE file for details
+
+## 📝 Type Checking
+
+```bash
 npm run typecheck
 ```
 
-若需代码规范校验，请告知使用的 lint 命令，我将集成到脚本中。
+## 🔧 Code Quality
+
+For linting and code style checking, please specify your preferred lint command and I'll integrate it into the scripts.
