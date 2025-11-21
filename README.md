@@ -16,7 +16,6 @@ A comprehensive Chrome automation toolkit for RPA (Robotic Process Automation) t
 
 - Node.js ≥ 16.0.0
 - Chrome browser installed
-- ChromeDriver (for Selenium-based scripts)
 
 ## 🔧 Installation
 
@@ -83,7 +82,7 @@ ts-node --esm src/6-historyRecordExtractor.ts
 ### 7. Clear Chat History
 **Batch deletes chat history entries from DeepSeek sidebar.**
 ```bash
-npm run clear-history -- --remote http://127.0.0.1:9515 --url https://chat.deepseek.com/ --timeout 20000 --headless
+npm run clear-history -- --base http://127.0.0.1:9222 --url https://chat.deepseek.com/ --timeout 20000
 ```
 
 ### LLM Ping
@@ -103,25 +102,17 @@ ts-node --esm src/takeSnapshot.ts
 ## 📝 Command Line Arguments
 
 ### Clear History Script Arguments:
-- `--remote`: Remote ChromeDriver address (default: `http://127.0.0.1:9515`)
+- `--base`: Chrome DevTools WebSocket URL (default: `http://127.0.0.1:9222`)
 - `--url`: DeepSeek entry URL (default: `https://chat.deepseek.com/`)
 - `--timeout`: Explicit wait timeout in milliseconds (default: `20000`)
-- `--headless`: Enable headless mode (optional)
-
-### Chrome DevTools Mode (Alternative):
-- `--base`: Chrome DevTools WebSocket URL (default: `http://127.0.0.1:9222`)
 
 ## 🏗️ Architecture
-
-### ChromeDriver Mode (Selenium WebDriver)
-- Uses Selenium WebDriver for browser automation
-- Requires ChromeDriver service running
-- Suitable for complex user interactions
 
 ### Chrome DevTools Protocol Mode
 - Direct communication with Chrome via WebSocket
 - No external dependencies required
 - Faster and more lightweight
+- Uses Chrome's built-in debugging capabilities
 
 ## 🔍 Technical Implementation
 
@@ -180,22 +171,6 @@ output/
 
 ## 🚀 Getting Started
 
-### Quick Start (ChromeDriver Mode)
-
-1. **Start ChromeDriver**:
-```bash
-chromedriver --port=9515 --allowed-origins=* --url-base=/
-```
-
-2. **Login to DeepSeek**: Open Chrome and login to https://chat.deepseek.com/
-
-3. **Run Clear History**:
-```bash
-npm run clear-history -- --remote http://127.0.0.1:9515 --url https://chat.deepseek.com/
-```
-
-### Quick Start (Chrome DevTools Mode)
-
 1. **Start Chrome with remote debugging**:
 ```bash
 # Windows
@@ -225,9 +200,9 @@ ts-node --esm src/7-clear-history.ts --base http://127.0.0.1:9222 --url https://
 - Check if the page has fully loaded
 
 **Connection Failed**:
-- Verify ChromeDriver is running on specified port
+- Verify Chrome is running with remote debugging enabled on port 9222
 - Check firewall settings
-- Ensure ChromeDriver version matches Chrome browser version
+- Ensure Chrome browser is responsive
 
 **Screenshot Save Failed**:
 - Ensure `output/` directory has write permissions
@@ -242,10 +217,9 @@ Enable verbose logging by checking the log files in the `logs/` directory.
 
 ## 📈 Performance Optimization
 
-- Use `--headless` mode for faster execution
 - Adjust `--timeout` based on network conditions
 - Close unnecessary browser tabs to free up resources
-- Use Chrome DevTools mode for better performance
+- Use Chrome DevTools Protocol for efficient browser automation
 
 ## 🔒 Security Considerations
 
